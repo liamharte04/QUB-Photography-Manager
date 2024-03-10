@@ -1,0 +1,107 @@
+package part01;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+public class ImageManager {
+    private ArrayList<ImageRecord> imageRecords; 
+
+    public ImageManager() {
+        imageRecords = new ArrayList<>();
+    }
+
+    /**
+     * Adds a new ImageRecord object to the image manager.
+     *
+     * @param fileName          The file name of the image.
+     * @param resolutionXAxis    The x resolution of the image (width)
+     * @param resolutionYAxis   The y resolution of the image (height).
+     * @param type              The type of the image (e.g., ASTRONOMY, LANDSCAPE).
+     * @param title             The title of the image.
+     * @param description       The description of the image.
+     * @param localDate 
+     * @return                  The newly created ImageRecord object.
+     */
+    public ImageRecord loadImage(String fileName, int resolutionWidth, int resolutionHeight, ImageType type, String title, String description, LocalDate date) {
+        // Generate a unique ID (you might adjust this if you have another ID generation strategy)
+        int id = imageRecords.size() + 1; 
+        ImageRecord image = new ImageRecord(id, fileName, resolutionWidth, resolutionHeight, type, title, description, date);
+        imageRecords.put(image.getId(), image);
+        return image;
+    }
+
+    /**
+     * Searches for an ImageRecord object by its unique ID.
+     *
+     * @param id  The ID of the image to search for.
+     * @return    The ImageRecord object with the matching ID, or null if not found.
+     */
+    public ImageRecord searchId(int id) {
+        for (ImageRecord image : imageRecords) {
+            if (image.getId() == id) {
+                return image;
+            }
+        }
+        return null; // Not found
+    }
+
+    /**
+     * Searches for ImageRecord objects that contain the given keyword in their title (partial match).
+     *
+     * @param keyword  The keyword to search for.
+     * @return         An ImageAlbum containing all matching ImageRecords, or an empty ImageAlbum if none found.
+     */
+    public ImageAlbum searchTitle(String keyword) {
+        ImageAlbum results = new ImageAlbum();
+        for (ImageRecord image : imageRecords) {
+            if (image.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                results.addImage(image);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Searches for ImageRecord objects that contain the given keyword in their description (partial match).
+     *
+     * @param keyword  The keyword to search for.
+     * @return         An ImageAlbum containing all matching ImageRecords, or an empty ImageAlbum if none found.
+     */
+    public ImageAlbum searchDescription(String keyword) {
+        ImageAlbum results = new ImageAlbum();
+        for (ImageRecord image : imageRecords) {
+            if (image.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                results.addImage(image);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Searches for ImageRecord objects added between a specified date range (inclusive).
+     *
+     * @param startDate  The start date of the range (inclusive).
+     * @param endDate    The end date of the range (inclusive).
+     * @return         An ImageAlbum containing all matching ImageRecords, or an empty ImageAlbum if none found.
+     */
+    public ImageAlbum searchByDateRange(LocalDate startDate, LocalDate endDate) {
+        ImageAlbum results = new ImageAlbum();
+        for (ImageRecord image : imageRecords) {
+            if (image.getDateAdded().compareTo(startDate) >= 0 && image.getDateAdded().compareTo(endDate) <= 0) {
+                results.addImage(image);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Returns an ImageAlbum containing all ImageRecord objects currently managed by the ImageManager.
+     *
+     * @return  An ImageAlbum containing all images.
+     */
+    public ImageAlbum getAllImages() {
+        ImageAlbum allImages = new ImageAlbum();
+        allImages.getImages().addAll(imageRecords.values()); // Add all ImageRecords to the album
+        return allImages;
+    }
+}
