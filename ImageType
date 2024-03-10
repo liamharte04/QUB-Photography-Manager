@@ -1,0 +1,17 @@
+package part01;
+
+/**
+ * This enumeration defines the different types of images the system can manage.
+ * Each represents a specific image category.
+ */
+public enum ImageType {
+    ASTRONOMY,     // Images related to space and celestial objects
+    ARCHITECTURE,  // Images of buildings and structures
+    SPORT,         // Images of sporting events and athletes
+    LANDSCAPE,     // Images of natural scenery
+    PORTRAIT,      // Images focused on people
+    NATURE,        // Images of plants, animals, and other natural elements
+    AERIAL,        // Images taken from an elevated perspective (e.g., aircraft, drones)
+    FOOD,          // Images of food and related items
+    OTHER          // A catch-all category for images that don't fit the other types
+}
