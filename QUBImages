@@ -1,0 +1,242 @@
+package part01;
+
+import java.util.Scanner;
+import java.time.LocalDate;
+
+public class QUBImages {
+	private ImageManager imageManager;
+	private Scanner scanner;
+
+	public QUBImages() {
+		imageManager = new ImageManager();
+		scanner = new Scanner(System.in);
+		addDefaultImages();
+	}
+
+	public void start() {
+		int choice;
+		do {
+			displayMenu();
+			choice = scanner.nextInt();
+			scanner.nextLine(); // Consume newline
+
+			switch (choice) {
+			case 1:
+				addImage();
+				break;
+			case 2:
+				searchImages();
+				break;
+			case 3:
+				displayAllImages();
+				break;
+			case 4:
+				System.out.println("Exiting...");
+				break;
+			default:
+				System.out.println("Invalid Choice. Please try again.");
+			}
+		} while (choice != 4);
+	}
+
+	// Helper methods for menu actions
+	private void displayMenu() {
+		System.out.println("\nQUB Images");
+		System.out.println("1. Add Image");
+		System.out.println("2. Search Images");
+		System.out.println("3. Display All Images");
+		System.out.println("4. Exit");
+		System.out.print("Enter your choice: ");
+	}
+
+	private void addImage() {
+		System.out.print("Enter Image File Name: ");
+		String fileName = scanner.nextLine();
+
+		System.out.print("Enter Image Resolution (width x height, e.g., 1920 1080): "); 
+		String resolutionStr = scanner.nextLine();
+
+		try {
+			String[] resolutionParts = resolutionStr.split("x");
+			int resolutionWidth = Integer.parseInt(resolutionParts[0].trim());
+			int resolutionHeight = Integer.parseInt(resolutionParts[1].trim());
+
+			System.out.print("Enter Image Type (ASTRONOMY, ARCHITECTURE, etc.): ");
+			String typeStr = scanner.nextLine().toUpperCase();
+			ImageType type = ImageType.valueOf(typeStr);
+
+			System.out.print("Enter Image Title: ");
+			String title = scanner.nextLine();
+
+			System.out.print("Enter Image Description: ");
+			String description = scanner.nextLine();
+
+			ImageRecord image = imageManager.loadImage(fileName, resolutionWidth, resolutionHeight, type, title, description, LocalDate.now());
+			System.out.println("Image Added Successfully! (ID: " + image.getId() + ")");
+
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid resolution format. Please enter width and height separated by 'x' (e.g., 1920x1080)");
+		} 
+	} 
+
+	private void searchImages() {
+		System.out.println("\nSearch Options:");
+		System.out.println("1. Search by ID");
+		System.out.println("2. Search by Title (Partial Match)");
+		System.out.println("3. Search by Description (Partial Match)");
+		System.out.println("4. Search by Date Range"); 
+
+		System.out.print("Enter your choice: ");
+		int choice = scanner.nextInt();
+		scanner.nextLine(); 
+
+		switch (choice) {
+		case 1:
+			searchById();
+			break;
+		case 2:
+			searchByTitle();
+			break;
+		case 3:
+			searchByDescription();
+			break;
+		case 4:
+			searchByDateRange();
+			break;
+		default:
+			System.out.println("Invalid search choice.");
+		}
+	}
+
+	private void searchById() {
+		System.out.print("Enter ID to search: ");
+		int id = scanner.nextInt();
+		ImageRecord result = imageManager.searchId(id);
+		if (result != null) {
+			System.out.println("\nImage Found:");
+			System.out.println(result); // Assuming toString is implemented in ImageRecord
+		} else {
+			System.out.println("Image with ID " + id + " not found.");
+		}
+	}
+
+	private void searchByTitle() {
+		System.out.print("Enter title keyword: ");
+		String keyword = scanner.nextLine();
+		ImageAlbum results = imageManager.searchTitle(keyword);
+		displaySearchResults(results);
+	}
+
+	private void searchByDescription() {
+		System.out.print("Enter description keyword: ");
+		String keyword = scanner.nextLine();
+		ImageAlbum results = imageManager.searchDescription(keyword); // Delegate to ImageManager
+		displaySearchResults(results);
+	}
+
+	private void searchByDateRange() {
+		System.out.print("Enter Start Date (YYYY-MM-DD): ");
+		LocalDate startDate = LocalDate.parse(scanner.nextLine());
+		System.out.print("Enter End Date (YYYY-MM-DD): ");
+		LocalDate endDate = LocalDate.parse(scanner.nextLine());
+		ImageAlbum results = imageManager.searchByDateRange(startDate, endDate); // Delegate to ImageManager
+		displaySearchResults(results);
+	}
+
+	private void displayAllImages() {
+		ImageAlbum allImages = imageManager.getAllImages();
+		displaySearchResults(allImages);
+	}
+
+	private void displaySearchResults(ImageAlbum results) {
+		if (results.getImages().isEmpty()) {
+			System.out.println("No images found.");
+		} else { 
+			System.out.println("\nSearch Results:");
+			ImageRecord image = results.getFirst(); 
+			while (image != null) {
+				System.out.println(image); // Assuming toString is implemented
+				image = results.getNext();
+			}
+		}
+	} 
+
+	private void addDefaultImages() {
+		// ASTRONOMY images
+		imageManager.loadImage("SaturnRings.jpg", 1800, 1012, ImageType.ASTRONOMY, 
+				"Saturn's Rings", "A close-up view of Saturn's iconic rings", 
+				LocalDate.parse("2023-05-22"));
+		imageManager.loadImage("InternationalSpaceStation.jpg", 1200, 765, ImageType.ASTRONOMY, 
+				"International Space Station (ISS)", "The ISS orbiting Earth", 
+				LocalDate.parse("2023-02-09"));
+
+		// ARCHITECTURE images
+		imageManager.loadImage("BurjKalifa.jpg", 669, 446, ImageType.ARCHITECTURE, 
+				"Burj Khalifa", "The world's tallest building in Dubai", 
+				LocalDate.parse("2023-08-17"));
+		imageManager.loadImage("RialtoBridge.jpg", 800, 533, ImageType.ARCHITECTURE, 
+				"Rialto Bridge", "Historic bridge crossing the Grand Canal in Venice", 
+				LocalDate.parse("2023-01-30"));
+
+		// SPORT images
+		imageManager.loadImage("MessiWorldCup.jpg", 4768, 3181, ImageType.SPORT, 
+				"Messi Lifting World Cup", "Lionel Messi celebrating Argentina's World Cup victory", 
+				LocalDate.parse("2022-12-18")); 
+		imageManager.loadImage("BrazilWorldCupLoss.jpg", 1440, 810, ImageType.SPORT, 
+				"Brazil World Cup Loss", "Disappointment for Brazil after a World Cup defeat to Germany", 
+				LocalDate.parse("2022-12-09")); 
+
+		// LANDSCAPE images
+		imageManager.loadImage("Hallstatt.jpg", 800, 470, ImageType.LANDSCAPE, 
+				"Hallstatt, Austria", "Picturesque lakeside village in Austria", 
+				LocalDate.parse("2023-03-01")); 
+		imageManager.loadImage("EaglesNest.jpg", 1000, 664, ImageType.LANDSCAPE, 
+				"Eagle's Nest", "Mountaintop retreat with panoramic views", 
+				LocalDate.parse("2023-06-15")); 
+
+		// PORTRAIT images
+		imageManager.loadImage("LynAndTiana.jpg", 1512, 2016, ImageType.PORTRAIT, 
+				"Lyn and Tiana", "Portrait of two friends", 
+				LocalDate.parse("2023-04-05")); 
+		imageManager.loadImage("LouiseLisbon.jpg", 3024, 4032, ImageType.PORTRAIT, 
+				"Louise in Lisbon", "Portrait of Louise on a trip to Lisbon", 
+				LocalDate.parse("2023-04-01")); 
+
+		// NATURE images
+		imageManager.loadImage("FrogFamily.jpg", 1500, 1000, ImageType.NATURE, 
+				"Frog Family", "A group of frogs on a lily pad", 
+				LocalDate.parse("2023-05-19")); 
+		imageManager.loadImage("EagleHunting.jpg", 2100, 1354, ImageType.NATURE, 
+				"Eagle Hunting", "An eagle swooping down to catch its prey", 
+				LocalDate.parse("2023-02-22")); 
+
+		// AERIAL images
+		imageManager.loadImage("BikiniAtoll.jpg", 3063, 1944, ImageType.AERIAL, 
+				"Bikini Atoll", "Aerial view of the Bikini Atoll in the Pacific Ocean", 
+				LocalDate.parse("2023-05-01")); 
+		imageManager.loadImage("TokyoFromAbove.jpg", 1536, 2048, ImageType.AERIAL, 
+				"Tokyo from Above", "A cityscape of Tokyo from a high vantage point", 
+				LocalDate.parse("2023-01-20")); 
+
+		// FOOD images
+		imageManager.loadImage("ChickenChorizoPasta.jpg", 1228, 808, ImageType.FOOD, 
+				"Chicken Chorizo Pasta", "A delicious pasta dish with chicken and chorizo", 
+				LocalDate.parse("2023-07-14")); 
+		imageManager.loadImage("SmokedSalmonFishcake.jpg", 900, 526, ImageType.FOOD, 
+				"SmokedSalmonFishcake", "Smoked salmon fishcake with a side salad", 
+				LocalDate.parse("2023-03-28")); 
+
+		// OTHER images
+		imageManager.loadImage("FarmerDog.jpg", 500, 667, ImageType.OTHER, 
+				"Farmer and his Dog", "A farmer working in a field with his loyal dog", 
+				LocalDate.parse("2023-06-01")); 
+		imageManager.loadImage("FlyingTractor.jpg", 6000, 4000, ImageType.OTHER, 
+				"Flying Tractor", "A humorous image of a tractor with a hot air balloon attached", 
+				LocalDate.parse("2023-08-04")); 
+	}
+
+	public static void main(String[] args) {
+		QUBImages app = new QUBImages();
+		app.start();
+	}
+}
