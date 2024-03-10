@@ -1,0 +1,50 @@
+package part01;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * This class represents an album that can hold a collection of ImageRecord objects.
+ * It provides methods for accessing images in order (first, next, previous).
+ */
+public class ImageAlbum {
+	private List<ImageRecord> images;
+	private int currentImageIndex; 
+
+	public ImageAlbum() {
+		images = new ArrayList<>();
+		currentImageIndex = -1; 
+	}
+
+	public void addImage(ImageRecord image) {
+		images.add(image);
+	}
+
+	public ImageRecord getFirst() {
+		if (images.isEmpty()) {
+			return null;
+		}
+		currentImageIndex = 0;
+		return images.get(currentImageIndex);
+	}
+
+	public ImageRecord getNext() {
+		if (images.isEmpty() || currentImageIndex == images.size() - 1) {
+			return null; 
+		}
+		currentImageIndex++;
+		return images.get(currentImageIndex);
+	}
+
+	public ImageRecord getPrevious() {
+		if (images.isEmpty() || currentImageIndex == 0) {
+			return null;
+		}
+		currentImageIndex--;
+		return images.get(currentImageIndex);
+	}
+	
+	public List<ImageRecord> getImages() {
+		return images;
+	}
+}
